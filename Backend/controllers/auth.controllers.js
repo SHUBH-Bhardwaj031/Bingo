@@ -145,7 +145,7 @@ export const resetPassword = async (req, res) => {
 }
 export const googleSignIn = async (req, res) => {
   try {
-    const { idToken, role } = req.body   // ← role bhi lo
+    const { idToken, role } = req.body
 
     if (!idToken) {
       return res.status(400).json({ message: 'ID token is required' })
@@ -153,7 +153,7 @@ export const googleSignIn = async (req, res) => {
 
     const firebaseAuth = getFirebaseAuth()
     const decoded = await firebaseAuth.verifyIdToken(idToken)
-    const { email, name, picture } = decoded
+    const { email, name, picture, uid } = decoded
 
     let user = await User.findOne({ email })
 
@@ -165,10 +165,10 @@ export const googleSignIn = async (req, res) => {
         firstName,
         lastName,
         email,
-        phone: "0000000000",
+        phone: `google_${uid}`,
         password: undefined,
         image: picture,
-        role: role || "user",   // ← role use karo, default "user"
+        role: role || "user",
         signInMethod: 'google',
       })
     }
@@ -187,7 +187,6 @@ export const googleSignIn = async (req, res) => {
     return res.status(500).json(`Google SignIn Error ${error}`)
   }
 }
-
 export const googleCheckUser = async (req, res) => {
   try {
     const { idToken } = req.body
