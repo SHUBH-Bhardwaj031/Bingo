@@ -4,6 +4,7 @@ import { serverUrl } from '../App'
 import { ToastContainer, toast } from 'react-toastify';
 import { auth, googleProvider } from '../firebase'
 import { signInWithPopup } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp() {
   const [showPass, setShowPass] = useState(false)
@@ -16,6 +17,8 @@ export default function SignUp() {
   const [role, SetRole] = useState("user")
   const [googleLoading, setGoogleLoading] = useState(false)
   const [showRoleModal, setShowRoleModal] = useState(false)
+  const [isSigningUp, setIsSigningUp] = useState(false)
+  const navigate = useNavigate()
 
   const checkStrength = (val) => {
     let score = 0
@@ -33,13 +36,18 @@ export default function SignUp() {
   }
 
   const handleSignup = async () => {
+    setIsSigningUp(true)
     try {
       const result = await axios.post(`${serverUrl}/api/auth/signup`, { firstName, lastName, phone, email, password, role }, { withCredentials: true })
       console.log(result)
       toast.success("Signup Successfully")
+      setTimeout(() => {
+        navigate("/signin")
+      }, 1500)
     } catch (error) {
       console.log(error)
       toast.error(error?.response?.data?.message || "Signup failed, try again")
+      setIsSigningUp(false)
     }
   }
 
@@ -205,31 +213,40 @@ export default function SignUp() {
           </div>
 
           {/* Role */}
+          <div className='text-xs font-medium text-stone-600 mb-3'>
+            <label htmlFor="role">Role</label>
+            <div className='flex gap-2'>
+              {[
+                { value: "user", label: "Customer" },
+                { value: "owner", label: "Owner" },
+                { value: "deliveryBoy", label: "Delivery Partner" },
+              ].map((r) => (
+                <button
+                  key={r.value}
+                  type="button"
+                  className='flex-1 font-medium border rounded-lg px-3 py-2 transition-colors bg-white rounded-xl text-sm cursor-pointer'
+                  onClick={() => { SetRole(r.value) }}
+                  style={role === r.value ? { backgroundColor: "#ff4d2d", color: "white" } : { border: `1px solid #ff4d2d`, color: "#ff4d2d" }}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* Role */}
-<div className='text-xs font-medium text-stone-600 mb-3'>
-  <label htmlFor="role">Role</label>
-  <div className='flex gap-2'>
-    {[
-      { value: "user", label: "Customer" },
-      { value: "owner", label: "Owner" },
-      { value: "deliveryBoy", label: "Delivery Partner" },
-    ].map((r) => (
-      <button
-        key={r.value}
-        type="button"
-        className='flex-1 font-medium border rounded-lg px-3 py-2 transition-colors bg-white rounded-xl text-sm cursor-pointer'
-        onClick={() => { SetRole(r.value) }}
-        style={role === r.value ? { backgroundColor: "#ff4d2d", color: "white" } : { border: `1px solid #ff4d2d`, color: "#ff4d2d" }}
-      >
-        {r.label}
-      </button>
-    ))}
-  </div>
-</div>
-
-          <button className="w-full h-12 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2" onClick={handleSignup}>
-            Create account →
+          <button
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            onClick={handleSignup}
+            disabled={isSigningUp}
+          >
+            {isSigningUp ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              <>Create account →</>
+            )}
           </button>
 
           <p className="text-center text-sm text-stone-500 mt-5">

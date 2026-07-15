@@ -22,7 +22,9 @@ export default function SignIn() {
       const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true })
       console.log(result)
       toast.success("sign in successfully")
+      navigate("/dashboard")
     } catch (error) {
+            toast.error("Email or Password is Invalid !")
       console.log(error)
     }
   }
