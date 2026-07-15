@@ -39,7 +39,7 @@ export default function SignUp() {
       toast.success("Signup Successfully")
     } catch (error) {
       console.log(error)
-      toast.error("Service under Maintainance")
+      toast.error(error?.response?.data?.message || "Signup failed, try again")
     }
   }
 
@@ -206,13 +206,27 @@ export default function SignUp() {
 
           {/* Role */}
 
-          <div className=' text-xs font-medium text-stone-600 mb-3'>
-            <label htmlFor="role">Role</label>
-            <div className='flex gap-2'> {["Customer", "Owner", "Delivery Partner"].map((e) => (
-              <button key={e} className='flex-1 font-medium border rounded-lg px-3 py-2 transition-colors bg-white border  rounded-xl text-sm cursor-pointer' onClick={() => { SetRole(e) }} style={role == e ? { backgroundColor: "#ff4d2d", color: "white" } : { border: `1 px solid #ff4d2d`, color: "#ff4d2d" }} >{e}</button>
-            ))}
-            </div>
-          </div>
+          {/* Role */}
+<div className='text-xs font-medium text-stone-600 mb-3'>
+  <label htmlFor="role">Role</label>
+  <div className='flex gap-2'>
+    {[
+      { value: "user", label: "Customer" },
+      { value: "owner", label: "Owner" },
+      { value: "deliveryBoy", label: "Delivery Partner" },
+    ].map((r) => (
+      <button
+        key={r.value}
+        type="button"
+        className='flex-1 font-medium border rounded-lg px-3 py-2 transition-colors bg-white rounded-xl text-sm cursor-pointer'
+        onClick={() => { SetRole(r.value) }}
+        style={role === r.value ? { backgroundColor: "#ff4d2d", color: "white" } : { border: `1px solid #ff4d2d`, color: "#ff4d2d" }}
+      >
+        {r.label}
+      </button>
+    ))}
+  </div>
+</div>
 
           <button className="w-full h-12 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2" onClick={handleSignup}>
             Create account →
