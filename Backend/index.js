@@ -1,42 +1,55 @@
-import express from "express"
-import dotenv from "dotenv"
-import connectDb from "./config/db.js"
-dotenv.config()
-import cookieParser from "cookie-parser"
-import authRouter from "./routes/auth.routes.js"
-import cors from "cors"
-import dns from "dns"
-dns.setServers(['8.8.8.8', '8.8.4.4'])
+import express from "express";
+import dotenv from "dotenv";
+import connectDb from "./config/db.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dns from "dns";
 
-const app=express()
+import authRouter from "./routes/auth.routes.js";
+import restaurantRouter from "./routes/restaurant.routes.js";
+import foodRouter from "./routes/food.routes.js";
 
-// frontend + Backend connection
-app.use(cors({
+dotenv.config();
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+const app = express();
+
+app.use(
+  cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true
-}))
+    credentials: true,
+  })
+);
 
-// convert frontend daata in json
-app.use(express.json())
+app.use(express.json());
 
-//cookie browser me parse karne ke liye
-app.use(cookieParser())
+app.use(cookieParser());
 
-// add api/auth sab router ke saamne
-app.use("/api/auth",authRouter)
+/* ===============================
+   API Routes
+=============================== */
 
+app.use("/api/auth", authRouter);
 
+app.use("/api/restaurants", restaurantRouter);
 
+app.use("/api/foods", foodRouter);
 
-const port=process.env.PORT || 5000
+/* ===============================
+   Health Check
+=============================== */
 
-app.listen(port, ()=>{
-    connectDb()
-    console.log(`Server is Running on ${port}`)
-})
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Bingo API Running 🚀",
+  });
+});
 
+const port = process.env.PORT || 8000;
 
-
-
-
-
+app.listen(port, async () => {
+  await connectDb();
+  console.log(`🚀 Server Running on Port ${port}`);
+});
