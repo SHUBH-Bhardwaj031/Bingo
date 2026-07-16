@@ -132,12 +132,17 @@ const restaurantSchema = new mongoose.Schema(
       default: false,
     },
 
-    offers: [
-      {
-        title: String,
-        discount: Number,
-      },
-    ],
+   offers: [
+  {
+    title: String,
+    description: String,
+    discountType: {
+      type: String,
+      enum: ["flat", "percentage"],
+    },
+    value: Number,
+  },
+],
   },
   {
     timestamps: true,

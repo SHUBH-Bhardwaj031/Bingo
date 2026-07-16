@@ -50,9 +50,9 @@ const foodSchema = new mongoose.Schema(
     },
 
     image: {
-      type: String,
-      default: "",
-    },
+  type: String,
+  default: "/images/foods/default-food.jpg",
+},
 
     price: {
       type: Number,
@@ -123,6 +123,14 @@ const foodSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+foodSchema.index({ restaurant: 1 });
+
+foodSchema.index({ category: 1 });
+
+foodSchema.index({ slug: 1 });
+
+foodSchema.index({ restaurant: 1, category: 1 });
 
 const Food = mongoose.model("Food", foodSchema);
 

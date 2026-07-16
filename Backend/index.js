@@ -8,6 +8,7 @@ import dns from "dns";
 import authRouter from "./routes/auth.routes.js";
 import restaurantRouter from "./routes/restaurant.routes.js";
 import foodRouter from "./routes/food.routes.js";
+import categoryRouter from "./routes/category.routes.js";
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/restaurants", restaurantRouter);
 
 app.use("/api/foods", foodRouter);
+
+app.use("/api/categories", categoryRouter);
 
 /* ===============================
    Health Check

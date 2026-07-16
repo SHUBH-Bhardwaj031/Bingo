@@ -5,6 +5,7 @@ import { serverUrl } from '../App'
 import { auth, googleProvider } from '../firebase'
 import { signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from "../context/AuthContext";
 
 export default function SignIn() {
   const [showPass, setShowPass] = useState(false)
@@ -15,14 +16,24 @@ export default function SignIn() {
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [pendingIdToken, setPendingIdToken] = useState(null)
   const navigate=useNavigate()
+  const { refreshUser } = useAuth();
 
   const handleSignin = async (e) => {
     e.preventDefault()
     try {
       const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true })
       console.log(result)
-      toast.success("sign in successfully")
-      navigate("/dashboard")
+     toast.success("Sign in successfully");
+
+const user = await refreshUser();
+
+if (user.role === "owner") {
+  navigate("/owner");
+} else if (user.role === "deliveryBoy") {
+  navigate("/delivery");
+} else {
+  navigate("/restaurants");
+}
     } catch (error) {
             toast.error("Email or Password is Invalid !")
       console.log(error)
@@ -71,7 +82,15 @@ export default function SignIn() {
       )
       console.log(response)
       toast.success("Signed in with Google successfully")
-      navigate("/dashboard")
+     const user = await refreshUser();
+
+if (user.role === "owner") {
+  navigate("/owner");
+} else if (user.role === "deliveryBoy") {
+  navigate("/delivery");
+} else {
+  navigate("/restaurants");
+}
     } catch (error) {
       console.log(error)
       toast.error("Google sign-in failed, try again")

@@ -34,13 +34,13 @@ export const createRestaurant = async (req, res) => {
 
 export const getAllRestaurants = async (req, res) => {
   try {
-    const restaurants = await getAllRestaurantsService();
+   const result = await getAllRestaurantsService(req.query);
 
     return res.status(200).json({
-      success: true,
-      total: restaurants.length,
-      restaurants,
-    });
+  success: true,
+  restaurants: result.restaurants,
+  pagination: result.pagination,
+});
   } catch (error) {
     return res.status(500).json({
       success: false,

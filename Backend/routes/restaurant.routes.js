@@ -26,6 +26,7 @@ router.get("/slug/:slug", getRestaurantBySlug);
 
 router.get("/:id", getRestaurantById);
 
+
 /*
 ========================================
 OWNER ROUTES
