@@ -5,84 +5,92 @@ import crypto from 'crypto'
 import { sendResetEmail } from '../utils/mailer.js'
 import { getFirebaseAuth } from '../config/firebaseAdmin.js'
 import jwt from 'jsonwebtoken'
-export const signUp= async (req,res)=>{
-try {
-     const {firstName,lastName,email,password,phone,role}=req.body
- const existingUser=await User.findOne({email})
- if(existingUser){
-    return res.status(400).json({message:"User Already exist. "})
 
- }
- if(password.length<6){
-    return res.status(400).json({message:"Password must be atleast 6 digits."})
-}
-if(phone.length<10){
-    return res.status(400).json({message:"Please Enter 10 digit number"})
+// Cookie options — production (cross-domain: Vercel + Render) vs local dev
+const isProd = process.env.NODE_ENV === "production"
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd,                    // true on Render (HTTPS), false on localhost (HTTP)
+  sameSite: isProd ? "none" : "lax", // "none" needed for cross-site cookies in prod
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
-const hashedPassword=await bcrypt.hash(password,10 )
+export const signUp = async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, phone, role } = req.body
 
-let user=await User.create({
-    firstName,
-    lastName,
-    email,
-    password:hashedPassword,
-    role,
-    phone,
+    const existingUser = await User.findOne({ email })
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists with this email." })
+    }
 
-})
+    const existingPhone = await User.findOne({ phone })
+    if (existingPhone) {
+      return res.status(400).json({ message: "This phone number is already registered." })
+    }
 
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters." })
+    }
+    if (phone.length < 10) {
+      return res.status(400).json({ message: "Please enter a 10 digit number." })
+    }
 
-  const token=await genToken(user._id)
-    res.cookie("token" , token ,{
-        secure:false,
-        sameSite:"strict",
-        maxAge:7*24*60*60*1000,
-        httpOnly:true
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    let user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role,
+      phone,
     })
+
+    const token = await genToken(user._id)
+    res.cookie("token", token, cookieOptions)
 
     res.status(201).json(user)
-} 
-catch (error) {
-        console.log("SIGNUP ERROR:", error)  
-    res.status(500).json(`Signup Error ${error}`)
-}
-} 
-export const signIn= async (req,res)=>{
-try {
-     const {email,password}=req.body
- const user=await User.findOne({email})
- if(!user){
-    return res.status(400).json({message:"User does not exist. "})
-
- }
-
-const isMatched=await bcrypt.compare(password,user.password)
-if(!isMatched){
-    return res.status(400).json({message:"password is incorrect"})
+  } catch (error) {
+    console.log("SIGNUP ERROR:", error)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0]
+      return res.status(400).json({ message: `This ${field} is already registered.` })
+    }
+    res.status(500).json({ message: `Signup Error: ${error.message}` })
+  }
 }
 
-  const token=await genToken(user._id)
-    res.cookie("token" , token ,{
-        secure:false,
-        sameSite:"strict",
-        maxAge:7*24*60*60*1000,
-        httpOnly:true
-    })
+export const signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const user = await User.findOne({ email })
+    if (!user) {
+      return res.status(400).json({ message: "User does not exist." })
+    }
+
+    const isMatched = await bcrypt.compare(password, user.password)
+    if (!isMatched) {
+      return res.status(400).json({ message: "Password is incorrect." })
+    }
+
+    const token = await genToken(user._id)
+    res.cookie("token", token, cookieOptions)
 
     res.status(200).json(user)
-} 
-catch (error) {
-     res.status(500).json(`SignIn Error ${error}`)
+  } catch (error) {
+    console.log("SIGNIN ERROR:", error)
+    res.status(500).json({ message: `SignIn Error: ${error.message}` })
+  }
 }
-} 
-export const signOut=async (req,res) =>
-    {
-   try {
-     res.clearCookie("token")
-     return res.status(200).json({message:"user log out successfully"})
-   } catch (error) {
-    return res.status(500).json({message:`log out error ${error}`})   }
+
+export const signOut = async (req, res) => {
+  try {
+    res.clearCookie("token", cookieOptions)
+    return res.status(200).json({ message: "User logged out successfully" })
+  } catch (error) {
+    return res.status(500).json({ message: `Log out error: ${error.message}` })
+  }
 }
 
 // STEP 1: user submits email -> we generate token, save it, email a link
@@ -92,16 +100,14 @@ export const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email })
 
     if (!user) {
-      // Don't reveal whether the email exists — just respond success either way
       return res.status(200).json({ message: 'If that email exists, a reset link has been sent' })
     }
 
-    // generate a random token
     const rawToken = crypto.randomBytes(32).toString('hex')
     const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex')
 
     user.resetPasswordToken = hashedToken
-    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000 // 15 minutes
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000
     await user.save()
 
     const resetLink = `${process.env.CLIENT_URL}/resetpassword/${rawToken}`
@@ -143,6 +149,7 @@ export const resetPassword = async (req, res) => {
     return res.status(500).json({ message: 'Something went wrong, try again' })
   }
 }
+
 export const googleSignIn = async (req, res) => {
   try {
     const { idToken, role } = req.body
@@ -174,19 +181,15 @@ export const googleSignIn = async (req, res) => {
     }
 
     const token = await genToken(user._id)
-    res.cookie("token", token, {
-      secure: false,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true
-    })
+    res.cookie("token", token, cookieOptions)
 
     return res.status(200).json(user)
   } catch (error) {
     console.log("GOOGLE SIGNIN ERROR:", error)
-    return res.status(500).json(`Google SignIn Error ${error}`)
+    return res.status(500).json({ message: `Google SignIn Error: ${error.message}` })
   }
 }
+
 export const googleCheckUser = async (req, res) => {
   try {
     const { idToken } = req.body
