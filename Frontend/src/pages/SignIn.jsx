@@ -16,7 +16,7 @@ export default function SignIn() {
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [pendingIdToken, setPendingIdToken] = useState(null)
   const navigate=useNavigate()
-  const { refreshUser } = useAuth();
+const { refreshUser, applyToken } = useAuth();
 
 const handleSignin = async (e) => {
     e.preventDefault()
@@ -24,8 +24,8 @@ const handleSignin = async (e) => {
       const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true })
       console.log(result)
 
-      // Signin API succeeded — now try loading the user profile separately,
-      // so a failure here doesn't get wrongly reported as "invalid password"
+      applyToken(result.data.token) // <-- save token so it works on every browser/device
+
       try {
         const user = await refreshUser();
         toast.success("Signed in successfully");
@@ -78,7 +78,7 @@ const handleSignin = async (e) => {
   }
 
   // STEP 4 — called either directly (existing user) or after role is picked (new user)
-  const completeGoogleSignIn = async (idToken, role) => {
+ const completeGoogleSignIn = async (idToken, role) => {
     setShowRoleModal(false)
     setGoogleLoading(true)
     try {
@@ -88,6 +88,8 @@ const handleSignin = async (e) => {
         { withCredentials: true }
       )
       console.log(response)
+
+      applyToken(response.data.token) // <-- save token
 
       try {
         const user = await refreshUser();

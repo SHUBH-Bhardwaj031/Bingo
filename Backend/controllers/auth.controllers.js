@@ -6,13 +6,19 @@ import { sendResetEmail } from '../utils/mailer.js'
 import { getFirebaseAuth } from '../config/firebaseAdmin.js'
 import jwt from 'jsonwebtoken'
 
-// Cookie options — production (cross-domain: Vercel + Render) vs local dev
 const isProd = process.env.NODE_ENV === "production"
 const cookieOptions = {
   httpOnly: true,
-  secure: isProd,                    // true on Render (HTTPS), false on localhost (HTTP)
-  sameSite: isProd ? "none" : "lax", // "none" needed for cross-site cookies in prod
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
+}
+
+// Helper: strip password before sending user back, and attach token
+const sanitizeUser = (user, token) => {
+  const userObj = user.toObject()
+  delete userObj.password
+  return { ...userObj, token }
 }
 
 export const signUp = async (req, res) => {
@@ -48,9 +54,9 @@ export const signUp = async (req, res) => {
     })
 
     const token = await genToken(user._id)
-    res.cookie("token", token, cookieOptions)
+    res.cookie("token", token, cookieOptions) // keep cookie too, works when same-site
 
-    res.status(201).json(user)
+    res.status(201).json(sanitizeUser(user, token))
   } catch (error) {
     console.log("SIGNUP ERROR:", error)
     if (error.code === 11000) {
@@ -77,7 +83,7 @@ export const signIn = async (req, res) => {
     const token = await genToken(user._id)
     res.cookie("token", token, cookieOptions)
 
-    res.status(200).json(user)
+    res.status(200).json(sanitizeUser(user, token))
   } catch (error) {
     console.log("SIGNIN ERROR:", error)
     res.status(500).json({ message: `SignIn Error: ${error.message}` })
@@ -93,7 +99,6 @@ export const signOut = async (req, res) => {
   }
 }
 
-// STEP 1: user submits email -> we generate token, save it, email a link
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body
@@ -120,7 +125,6 @@ export const forgotPassword = async (req, res) => {
   }
 }
 
-// STEP 2: user clicks link -> submits new password + token
 export const resetPassword = async (req, res) => {
   try {
     const { token } = req.params
@@ -183,7 +187,7 @@ export const googleSignIn = async (req, res) => {
     const token = await genToken(user._id)
     res.cookie("token", token, cookieOptions)
 
-    return res.status(200).json(user)
+    return res.status(200).json(sanitizeUser(user, token))
   } catch (error) {
     console.log("GOOGLE SIGNIN ERROR:", error)
     return res.status(500).json({ message: `Google SignIn Error: ${error.message}` })
@@ -214,10 +218,6 @@ export const googleCheckUser = async (req, res) => {
     return res.status(500).json({ message: 'Something went wrong, try again' })
   }
 }
-
-/* ==========================================
-   Get Current Logged In User
-========================================== */
 
 export const getCurrentUser = async (req, res) => {
   try {

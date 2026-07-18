@@ -5,8 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import { auth, googleProvider } from '../firebase'
 import { signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext"; 
 
 export default function SignUp() {
+   const { applyToken } = useAuth(); 
   const [showPass, setShowPass] = useState(false)
   const [strength, setStrength] = useState(null)
   const [firstName, setFirstName] = useState("")
@@ -35,11 +37,13 @@ export default function SignUp() {
     3: 'bg-yellow-400', 4: 'bg-green-500'
   }
 
-  const handleSignup = async () => {
+
+const handleSignup = async () => {
     setIsSigningUp(true)
     try {
       const result = await axios.post(`${serverUrl}/api/auth/signup`, { firstName, lastName, phone, email, password, role }, { withCredentials: true })
       console.log(result)
+      applyToken(result.data.token) // <-- save token
       toast.success("Signup Successfully")
       setTimeout(() => {
         navigate("/signin")
@@ -51,7 +55,7 @@ export default function SignUp() {
     }
   }
 
-  const handleGoogleSignIn = async (selectedRole) => {
+const handleGoogleSignIn = async (selectedRole) => {
     setShowRoleModal(false)
     setGoogleLoading(true)
     try {
@@ -65,7 +69,9 @@ export default function SignUp() {
       )
 
       console.log(response)
+      applyToken(response.data.token) // <-- save token
       toast.success("Signed up with Google successfully")
+      navigate("/restaurants")
     } catch (error) {
       console.log(error)
       toast.error("Google sign-in failed, try again")
