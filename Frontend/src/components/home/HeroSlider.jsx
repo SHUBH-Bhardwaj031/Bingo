@@ -12,6 +12,7 @@ const banners = [
     description: "Order your favourite food in minutes.",
     button: "Order Now",
     bg: "from-orange-500 via-orange-400 to-yellow-400",
+    img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkQpf6tmISDPXB4Hqld9-G6lf-lHYAKSIjEAPEmWNJDQ&s=10"
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ const banners = [
     description: "Enjoy delicious meals without delivery charges.",
     button: "Explore",
     bg: "from-red-500 via-orange-500 to-yellow-500",
+    img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVpKE3zOw1VmC2PM1pbiiEA1EHoePyvkgGXhq5wm4ssw&s=10"
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ const banners = [
     description: "Late night? We've got you covered.",
     button: "Browse Restaurants",
     bg: "from-slate-900 via-slate-800 to-slate-700",
+    img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRF24XjHGnocyM-JTORz_q-q170bLtynX8njHiilub-Xg&s=10"
   },
 ];
 
@@ -82,36 +85,18 @@ export default function HeroSlider() {
 
                 {/* RIGHT SIDE PLACEHOLDER */}
                 <div className="hidden lg:flex items-center justify-center">
-                  <div className="w-[360px] h-[360px] rounded-full bg-white/10 backdrop-blur-lg border border-white/20 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <div className="text-8xl">🍔</div>
-
-                      <p className="mt-6 text-xl font-semibold">
-                        Food Image
-                      </p>
-
-                      <p className="text-sm opacity-70">
-                        Replace with asset later
-                      </p>
-                    </div>
+                  <div className="w-[360px] h-[360px] rounded-full bg-white/10 backdrop-blur-lg border border-white/20 overflow-hidden flex items-center justify-center">
+                    <img
+                      src={banner.img}
+                      alt={banner.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Decorative Cards */}
-              <div className="hidden xl:block absolute right-10 bottom-10 bg-white rounded-2xl p-5 shadow-2xl w-56">
-                <p className="text-gray-500 text-sm">
-                  Delivery Time
-                </p>
-
-                <h3 className="text-3xl font-bold text-orange-500">
-                  25 mins
-                </h3>
-
-                <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full w-3/4 bg-orange-500 rounded-full"></div>
-                </div>
-              </div>
+              
             </div>
           </SwiperSlide>
         ))}

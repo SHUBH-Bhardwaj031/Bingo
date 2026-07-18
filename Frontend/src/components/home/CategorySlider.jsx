@@ -87,23 +87,23 @@ export default function CategorySlider() {
                   shadow-md
                   border
                   border-gray-100
+                  overflow-hidden
                   flex
                   items-center
                   justify-center
-                  text-5xl
                   transition-all
                   duration-300
-                  group-hover:bg-orange-500
                   group-hover:scale-110
                   group-hover:shadow-xl
                 "
               >
 
-                <span className="transition-all duration-300 group-hover:scale-125">
-
-                  {category.icon}
-
-                </span>
+                <img
+                  src={category.icon}
+                  alt={category.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                />
 
               </div>
 

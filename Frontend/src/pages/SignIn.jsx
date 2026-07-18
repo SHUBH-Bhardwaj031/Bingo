@@ -6,6 +6,7 @@ import { auth, googleProvider } from '../firebase'
 import { signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from "../context/AuthContext";
+import bingoLogo from '../assets/Bingo_Logo.png'
 
 export default function SignIn() {
   const [showPass, setShowPass] = useState(false)
@@ -128,7 +129,7 @@ const handleSignin = async (e) => {
         <div className="absolute w-40 h-40 bg-orange-500 rounded-full -bottom-8 -left-10 opacity-[0.07]" />
 
         <div className="flex items-center gap-3 z-10">
-          <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-xl">🍔</div>
+          <img src={bingoLogo} alt="Bingo" className="w-10 h-10 rounded-xl object-contain" />
           <span className="text-white text-xl font-medium">Bingo</span>
         </div>
 

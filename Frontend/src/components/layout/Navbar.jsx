@@ -14,6 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import bingoLogo from '../../assets/Bingo_Logo.png'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -65,9 +66,7 @@ export default function Navbar() {
           <div className="flex items-center gap-10">
             {/* Logo */}
             <div className="flex items-center gap-3 cursor-pointer">
-              <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                B
-              </div>
+                  <img src={bingoLogo} alt="Bingo" className="w-10 h-10 rounded-xl object-contain" />
 
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
