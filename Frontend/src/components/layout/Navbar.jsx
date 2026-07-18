@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search,
   MapPin,
@@ -9,12 +9,19 @@ import {
   Menu,
   X,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +32,24 @@ export default function Navbar() {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Close profile dropdown when clicking outside it
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setProfileMenuOpen(false);
+    setMobileMenu(false);
+    await logout();
+    navigate("/signin");
+  };
 
   return (
     <>
@@ -118,24 +143,60 @@ export default function Navbar() {
               </span>
             </button>
 
-            <button className="flex items-center gap-2">
-              <div className="w-11 h-11 rounded-full bg-orange-100 flex items-center justify-center">
-                <User
-                  size={20}
-                  className="text-orange-500"
+            {/* PROFILE + DROPDOWN */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setProfileMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2"
+              >
+                <div className="w-11 h-11 rounded-full bg-orange-100 flex items-center justify-center">
+                  <User
+                    size={20}
+                    className="text-orange-500"
+                  />
+                </div>
+
+                <div className="text-left">
+                  <p className="text-xs text-gray-500">
+                    Hello
+                  </p>
+
+                  <p className="font-semibold text-sm">
+                    {user?.firstName || "there"}
+                  </p>
+                </div>
+
+                <ChevronDown
+                  size={15}
+                  className={`transition ${profileMenuOpen ? "rotate-180" : ""}`}
                 />
-              </div>
+              </button>
 
-              <div className="text-left">
-                <p className="text-xs text-gray-500">
-                  Hello
-                </p>
+              {profileMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute right-0 mt-3 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
+                >
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold truncate">
+                      {user?.firstName} {user?.lastName}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {user?.email}
+                    </p>
+                  </div>
 
-                <p className="font-semibold text-sm">
-                  Shubham
-                </p>
-              </div>
-            </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
+                </motion.div>
+              )}
+            </div>
           </div>
 
           {/* MOBILE */}
@@ -177,6 +238,13 @@ export default function Navbar() {
             </button>
           </div>
 
+          {user && (
+            <div className="mb-6 pb-6 border-b border-gray-100">
+              <p className="font-semibold">{user.firstName} {user.lastName}</p>
+              <p className="text-xs text-gray-400">{user.email}</p>
+            </div>
+          )}
+
           <div className="space-y-6">
             <button className="flex items-center gap-4">
               <Heart />
@@ -196,6 +264,14 @@ export default function Navbar() {
             <button className="flex items-center gap-4">
               <User />
               Profile
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-4 text-red-500"
+            >
+              <LogOut />
+              Logout
             </button>
           </div>
         </motion.div>
