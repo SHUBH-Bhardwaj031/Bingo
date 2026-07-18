@@ -26,9 +26,11 @@ const handleSignin = async (e) => {
 
       applyToken(result.data.token) // <-- save token so it works on every browser/device
 
-      try {
+     try {
         const user = await refreshUser();
+        if (!user) throw new Error("Failed to load profile")
         toast.success("Signed in successfully");
+        
 
         if (user.role === "owner") {
           navigate("/owner");
@@ -91,9 +93,11 @@ const handleSignin = async (e) => {
 
       applyToken(response.data.token) // <-- save token
 
-      try {
+     try {
         const user = await refreshUser();
-        toast.success("Signed in with Google successfully")
+        if (!user) throw new Error("Failed to load profile")
+        toast.success("Signed in with successfully");
+        
 
         if (user.role === "owner") {
           navigate("/owner");
