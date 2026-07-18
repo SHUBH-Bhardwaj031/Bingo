@@ -18,25 +18,32 @@ export default function SignIn() {
   const navigate=useNavigate()
   const { refreshUser } = useAuth();
 
-  const handleSignin = async (e) => {
+const handleSignin = async (e) => {
     e.preventDefault()
     try {
       const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true })
       console.log(result)
-     toast.success("Sign in successfully");
 
-const user = await refreshUser();
+      // Signin API succeeded — now try loading the user profile separately,
+      // so a failure here doesn't get wrongly reported as "invalid password"
+      try {
+        const user = await refreshUser();
+        toast.success("Signed in successfully");
 
-if (user.role === "owner") {
-  navigate("/owner");
-} else if (user.role === "deliveryBoy") {
-  navigate("/delivery");
-} else {
-  navigate("/restaurants");
-}
+        if (user.role === "owner") {
+          navigate("/owner");
+        } else if (user.role === "deliveryBoy") {
+          navigate("/delivery");
+        } else {
+          navigate("/restaurants");
+        }
+      } catch (refreshError) {
+        console.log("refreshUser error:", refreshError)
+        toast.error("Signed in, but couldn't load your profile. Please try refreshing.")
+      }
     } catch (error) {
-            toast.error("Email or Password is Invalid !")
       console.log(error)
+      toast.error(error?.response?.data?.message || "Email or Password is Invalid!")
     }
   }
 
@@ -81,19 +88,25 @@ if (user.role === "owner") {
         { withCredentials: true }
       )
       console.log(response)
-      toast.success("Signed in with Google successfully")
-     const user = await refreshUser();
 
-if (user.role === "owner") {
-  navigate("/owner");
-} else if (user.role === "deliveryBoy") {
-  navigate("/delivery");
-} else {
-  navigate("/restaurants");
-}
+      try {
+        const user = await refreshUser();
+        toast.success("Signed in with Google successfully")
+
+        if (user.role === "owner") {
+          navigate("/owner");
+        } else if (user.role === "deliveryBoy") {
+          navigate("/delivery");
+        } else {
+          navigate("/restaurants");
+        }
+      } catch (refreshError) {
+        console.log("refreshUser error:", refreshError)
+        toast.error("Signed in, but couldn't load your profile. Please try refreshing.")
+      }
     } catch (error) {
       console.log(error)
-      toast.error("Google sign-in failed, try again")
+      toast.error(error?.response?.data?.message || "Google sign-in failed, try again")
     } finally {
       setGoogleLoading(false)
       setPendingIdToken(null)
