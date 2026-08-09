@@ -78,7 +78,7 @@ export default function HeroSlider() {
                     {banner.description}
                   </p>
 
-                  <button className="mt-8 px-8 py-4 rounded-2xl bg-white text-orange-600 font-bold text-lg hover:scale-105 transition duration-300 shadow-xl">
+                  <button className="px-8 py-4 mb-2 rounded-2xl bg-white text-orange-600 font-bold text-lg hover:scale-105 transition duration-300 shadow-xl">
                     {banner.button}
                   </button>
                 </div>

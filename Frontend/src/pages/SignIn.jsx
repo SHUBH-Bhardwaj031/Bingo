@@ -231,7 +231,7 @@ const handleSignin = async (e) => {
               />
               Remember me
             </label>
-            <a href="/forgotpaasword" className="text-xs text-orange-500 font-medium hover:underline">
+            <a href="/forgotpassword" className="text-xs text-orange-500 font-medium hover:underline">
               Forgot password?
             </a>
           </div>

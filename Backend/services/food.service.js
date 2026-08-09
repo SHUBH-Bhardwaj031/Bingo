@@ -1,4 +1,5 @@
 import Food from "../models/food.model.js";
+import Category from "../models/category.model.js";
 
 /* ==========================================
    Create Food
@@ -46,13 +47,31 @@ export const getFoodsByRestaurantService = async (
    Get Foods By Category
 ========================================== */
 
-export const getFoodsByCategoryService = async (
-  categoryId
-) => {
-  return await Food.find({
-    category: categoryId,
+export const getFoodsByCategoryService = async (slug) => {
+  const category = await Category.findOne({
+    slug,
+    isActive: true,
+  });
+
+  if (!category) {
+    return {
+      category: null,
+      foods: [],
+    };
+  }
+
+  const foods = await Food.find({
+    category: category._id,
     isAvailable: true,
-  }).sort({ createdAt: -1 });
+  })
+    .populate("restaurant", "name logo rating deliveryTime")
+    .populate("category", "name slug banner")
+    .sort({ rating: -1 });
+
+  return {
+    category,
+    foods,
+  };
 };
 
 /* ==========================================

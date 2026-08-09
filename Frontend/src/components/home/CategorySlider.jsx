@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ChevronRight } from "lucide-react";
 
@@ -7,7 +8,7 @@ import { serverUrl } from "../../App";
 export default function CategorySlider() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-
+const navigate = useNavigate();
   const getCategories = async () => {
     try {
       const { data } = await axios.get(
@@ -74,9 +75,12 @@ export default function CategorySlider() {
           {categories.map((category) => (
 
             <div
-              key={category._id}
-              className="group flex-shrink-0 cursor-pointer"
-            >
+ 
+            key={category._id}
+ 
+            onClick={() => navigate(`/category/${category.slug}`)}
+ className="group flex-shrink-0 cursor-pointer"
+>
 
               <div
                 className="

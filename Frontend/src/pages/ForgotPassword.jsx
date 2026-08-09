@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast, ToastContainer } from 'react-toastify'
 import { serverUrl } from '../App'
@@ -7,6 +7,15 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const timer = setInterval(() => setCooldown((c) => c - 1), 1000)
+    return () => clearInterval(timer)
+  }, [cooldown])
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   const handleForgotPassword = async (e) => {
     e.preventDefault()
@@ -14,12 +23,17 @@ export default function ForgotPassword() {
       toast.error("Please enter your email")
       return
     }
+    if (!isValidEmail(email)) {
+      toast.error("Please enter a valid email address")
+      return
+    }
     setLoading(true)
     try {
       const result = await axios.post(`${serverUrl}/api/auth/forgotpassword`, { email }, { withCredentials: true })
       console.log(result)
-      toast.success("Reset link sent to your email")
+      toast.success("If that email exists, a reset link has been sent")
       setSent(true)
+      setCooldown(30)
     } catch (error) {
       console.log(error)
       toast.error(error?.response?.data?.message || "Something went wrong")
@@ -50,7 +64,6 @@ export default function ForgotPassword() {
             Enter the email linked to your account and we'll send you a link to get back in.
           </p>
 
-          {/* Info Card */}
           <div className="bg-stone-800 rounded-xl p-4 flex items-center gap-3 border border-stone-700">
             <div className="w-10 h-10 bg-orange-500/15 rounded-lg flex items-center justify-center text-lg flex-shrink-0">🔑</div>
             <div>
@@ -74,7 +87,6 @@ export default function ForgotPassword() {
                 <p className="text-stone-500 text-sm">Enter your email and we'll send you a reset link</p>
               </div>
 
-              {/* Email */}
               <div className="mb-6">
                 <label className="block text-xs font-medium text-stone-600 mb-1.5">Email address</label>
                 <div className="relative flex items-center">
@@ -91,10 +103,10 @@ export default function ForgotPassword() {
 
               <button
                 onClick={handleForgotPassword}
-                disabled={loading}
+                disabled={loading || cooldown > 0}
                 className="w-full h-12 bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:active:scale-100"
               >
-                {loading ? "Sending..." : "Send reset link →"}
+                {loading ? "Sending..." : cooldown > 0 ? `Resend in ${cooldown}s` : "Send reset link →"}
               </button>
             </>
           ) : (
@@ -105,10 +117,11 @@ export default function ForgotPassword() {
                 We've sent a password reset link to <span className="text-stone-800 font-medium">{email}</span>
               </p>
               <button
-                onClick={() => setSent(false)}
-                className="w-full h-12 bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 rounded-xl text-sm font-medium transition-all"
+                onClick={() => { setSent(false); setCooldown(0) }}
+                disabled={cooldown > 0}
+                className="w-full h-12 bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
               >
-                Use a different email
+                {cooldown > 0 ? `Wait ${cooldown}s to try again` : "Use a different email"}
               </button>
             </div>
           )}

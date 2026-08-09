@@ -1,14 +1,21 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
+import Home from "./pages/Home";
+
 import RestaurantListing from "./pages/RestaurantListing";
+import RestaurantDetails from "./pages/RestaurantDetails";
+import CategoryPage from "./pages/CategoryPage";
+
 import OwnerDashboard from "./pages/OwnerDashboard";
 import DeliveryDashboard from "./pages/DeliveryDashboard";
-import RestaurantDetails from "./pages/RestaurantDetails";
+import Cart from "./pages/Cart";
+
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GuestRoute from "./components/auth/GuestRoute";
 import OwnerRoute from "./components/auth/OwnerRoute";
@@ -18,100 +25,160 @@ export const serverUrl =
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      {/* ================= TOAST NOTIFICATIONS ================= */}
 
-      {/* Default */}
-      <Route path="/" element={<Navigate to="/signin" replace />} />
-
-      {/* Guest Routes */}
-      <Route
-        path="/signin"
-        element={
-          <GuestRoute>
-            <SignIn />
-          </GuestRoute>
-        }
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 2200,
+          style: {
+            borderRadius: "18px",
+            padding: "12px 16px",
+            background: "#ffffff",
+            color: "#1f2937",
+            fontWeight: "600",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.15)",
+          },
+        }}
       />
 
-      <Route
-        path="/signup"
-        element={
-          <GuestRoute>
-            <SignUp />
-          </GuestRoute>
-        }
-      />
+      {/* ================= ROUTES ================= */}
 
-      <Route
-        path="/forgotpassword"
-        element={
-          <GuestRoute>
-            <ForgotPassword />
-          </GuestRoute>
-        }
-      />
+      <Routes>
 
-      <Route
-        path="/resetpassword/:token"
-        element={
-          <GuestRoute>
-            <ResetPassword />
-          </GuestRoute>
-        }
-      />
+        {/* ================= HOME ================= */}
 
-      {/* Customer */}
-      <Route
-       path="/restaurants"
-        element={
-          <ProtectedRoute>
-           <RestaurantListing />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Owner */}
-      <Route
-        path="/owner"
-        element={
-          <OwnerRoute>
-            <OwnerDashboard />
-          </OwnerRoute>
-        }
-      />
+        {/* ================= GUEST ROUTES ================= */}
 
-      {/* Delivery */}
-      <Route
-        path="/delivery"
-        element={
-          <ProtectedRoute>
-            <DeliveryDashboard />
-          </ProtectedRoute>
-        }
-      />
-<Route
-  path="/restaurants/:slug"
-  element={
-    <ProtectedRoute>
-      <RestaurantDetails />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/restaurants/slug/:slug"
-  element={
-    <ProtectedRoute>
-      <RestaurantDetails />
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/signin"
+          element={
+            <GuestRoute>
+              <SignIn />
+            </GuestRoute>
+          }
+        />
 
-      {/* 404 */}
-      <Route
-        path="*"
-        element={<Navigate to="/signin" replace />}
-      />
+        <Route
+          path="/signup"
+          element={
+            <GuestRoute>
+              <SignUp />
+            </GuestRoute>
+          }
+        />
 
-    </Routes>
+        <Route
+          path="/forgotpassword"
+          element={
+            <GuestRoute>
+              <ForgotPassword />
+            </GuestRoute>
+          }
+        />
+
+        <Route
+          path="/resetpassword/:token"
+          element={
+            <GuestRoute>
+              <ResetPassword />
+            </GuestRoute>
+          }
+        />
+
+        {/* ================= CUSTOMER ================= */}
+
+        <Route
+          path="/restaurants"
+          element={
+            <ProtectedRoute>
+              <RestaurantListing />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= CATEGORY ================= */}
+
+        <Route
+          path="/category/:category"
+          element={
+            <ProtectedRoute>
+              <CategoryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= RESTAURANT DETAILS ================= */}
+
+        <Route
+          path="/restaurants/:slug"
+          element={
+            <ProtectedRoute>
+              <RestaurantDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/restaurants/slug/:slug"
+          element={
+            <ProtectedRoute>
+              <RestaurantDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= CART ================= */}
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= OWNER ================= */}
+
+        <Route
+          path="/owner"
+          element={
+            <OwnerRoute>
+              <OwnerDashboard />
+            </OwnerRoute>
+          }
+        />
+
+        {/* ================= DELIVERY ================= */}
+
+        <Route
+          path="/delivery"
+          element={
+            <ProtectedRoute>
+              <DeliveryDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= 404 ================= */}
+
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+
+      </Routes>
+    </>
   );
 }

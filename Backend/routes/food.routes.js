@@ -25,7 +25,7 @@ router.get("/:id", getFoodById);
 
 router.get("/restaurant/:restaurantId", getFoodsByRestaurant);
 
-router.get("/category/:categoryId", getFoodsByCategory);
+router.get("/category/:slug", getFoodsByCategory);
 
 /* ==========================================
    Owner Routes

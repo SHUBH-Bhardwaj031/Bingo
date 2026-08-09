@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-import { Star, Clock3, MapPin, IndianRupee } from "lucide-react";
+import {
+  Star,
+  Clock3,
+  MapPin,
+  IndianRupee,
+} from "lucide-react";
 
 import { serverUrl } from "../App";
 import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 
 const PLACEHOLDER =
   "https://placehold.co/1400x500/F97316/FFFFFF?text=Bingo";
@@ -18,6 +24,8 @@ export default function RestaurantDetails() {
 
   const getRestaurant = async () => {
     try {
+      setLoading(true);
+
       const { data } = await axios.get(
         `${serverUrl}/api/restaurants/slug/${slug}`,
         {
@@ -39,23 +47,50 @@ export default function RestaurantDetails() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-xl font-semibold">
-        Loading Restaurant...
-      </div>
+      <main className="min-h-screen bg-[#F8F9FB]">
+
+        <Navbar />
+
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <p className="text-xl font-semibold text-gray-600">
+            Loading Restaurant...
+          </p>
+        </div>
+
+        <Footer />
+
+      </main>
     );
   }
 
   if (!restaurant) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-2xl font-bold">
-        Restaurant Not Found
-      </div>
+      <main className="min-h-screen bg-[#F8F9FB]">
+
+        <Navbar />
+
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+
+          <h1 className="text-3xl font-bold text-gray-800">
+            Restaurant Not Found
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            The restaurant you're looking for doesn't exist.
+          </p>
+
+        </div>
+
+        <Footer />
+
+      </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-[#F8F9FB]">
 
+      {/* Navbar */}
       <Navbar />
 
       {/* Cover */}
@@ -77,8 +112,19 @@ export default function RestaurantDetails() {
 
           <img
             src={restaurant.logo || PLACEHOLDER}
-            alt=""
-            className="w-28 h-28 rounded-2xl object-cover border-4 border-white shadow-xl"
+            alt={restaurant.name}
+            onError={(e) => {
+              e.target.src = PLACEHOLDER;
+            }}
+            className="
+              w-28
+              h-28
+              rounded-2xl
+              object-cover
+              border-4
+              border-white
+              shadow-xl
+            "
           />
 
           <div className="text-white">
@@ -103,11 +149,19 @@ export default function RestaurantDetails() {
 
         <div className="grid md:grid-cols-4 gap-5">
 
+          {/* Rating */}
+
           <div className="bg-white rounded-2xl p-5 shadow">
 
             <div className="flex items-center gap-2 text-green-600 font-bold text-xl">
-              <Star fill="currentColor" size={20} />
+
+              <Star
+                fill="currentColor"
+                size={20}
+              />
+
               {restaurant.rating}
+
             </div>
 
             <p className="text-gray-500 mt-2">
@@ -115,6 +169,8 @@ export default function RestaurantDetails() {
             </p>
 
           </div>
+
+          {/* Delivery */}
 
           <div className="bg-white rounded-2xl p-5 shadow">
 
@@ -132,6 +188,8 @@ export default function RestaurantDetails() {
 
           </div>
 
+          {/* Price */}
+
           <div className="bg-white rounded-2xl p-5 shadow">
 
             <div className="flex items-center gap-2 font-bold text-xl">
@@ -147,6 +205,8 @@ export default function RestaurantDetails() {
             </p>
 
           </div>
+
+          {/* Location */}
 
           <div className="bg-white rounded-2xl p-5 shadow">
 
@@ -171,17 +231,22 @@ export default function RestaurantDetails() {
         <div className="mt-12">
 
           <h2 className="text-3xl font-bold mb-5">
-
             Cuisines
-
           </h2>
 
           <div className="flex flex-wrap gap-4">
 
-            {restaurant.cuisines.map((item) => (
+            {restaurant.cuisines?.map((item) => (
               <span
                 key={item}
-                className="px-5 py-2 rounded-full bg-orange-100 text-orange-600 font-medium"
+                className="
+                  px-5
+                  py-2
+                  rounded-full
+                  bg-orange-100
+                  text-orange-600
+                  font-medium
+                "
               >
                 {item}
               </span>
@@ -196,18 +261,25 @@ export default function RestaurantDetails() {
         <div className="mt-14">
 
           <h2 className="text-3xl font-bold mb-6">
-
             Available Offers
-
           </h2>
 
           <div className="grid md:grid-cols-2 gap-5">
 
-            {restaurant.offers.map((offer) => (
+            {restaurant.offers?.map((offer) => (
               <div
                 key={offer._id}
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-6 shadow-lg"
+                className="
+                  bg-gradient-to-r
+                  from-orange-500
+                  to-red-500
+                  text-white
+                  rounded-2xl
+                  p-6
+                  shadow-lg
+                "
               >
+
                 <h3 className="text-2xl font-bold">
                   {offer.title}
                 </h3>
@@ -223,25 +295,24 @@ export default function RestaurantDetails() {
 
         </div>
 
-        {/* Next Step */}
+        {/* Menu */}
 
         <div className="mt-16 rounded-2xl bg-white shadow p-10">
 
           <h2 className="text-3xl font-bold">
-
             Menu
-
           </h2>
 
           <p className="text-gray-500 mt-3">
-
             Food items will appear here in the next step.
-
           </p>
 
         </div>
 
       </section>
+
+      {/* Footer */}
+      <Footer />
 
     </main>
   );

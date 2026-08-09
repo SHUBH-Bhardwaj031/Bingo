@@ -10,11 +10,12 @@ import {
   X,
   ChevronDown,
   LogOut,
-} from "lucide-react";
+} from "lucide-react";  
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import bingoLogo from '../../assets/Bingo_Logo.png'
+import Cart from "../../pages/Cart";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -134,13 +135,10 @@ export default function Navbar() {
               </span>
             </button>
 
-            <button className="relative hover:text-orange-500 transition">
-              <ShoppingCart size={24} />
-
-              <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center">
-                3
-              </span>
-            </button>
+             
+               <a href="/cart" className="relative hover:text-orange-500 transition" > <ShoppingCart size={24}  />
+               <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center"> 3</span></a>
+            
 
             {/* PROFILE + DROPDOWN */}
             <div className="relative" ref={profileRef}>

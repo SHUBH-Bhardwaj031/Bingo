@@ -12,6 +12,7 @@ import {
 } from "../controllers/auth.controllers.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { forgotPasswordLimiter } from "../middlewares/rateLimiter.middleware.js";
 
 const authRouter = express.Router();
 
@@ -41,6 +42,7 @@ authRouter.get(
 
 authRouter.post(
   "/forgotpassword",
+  forgotPasswordLimiter,
   forgotPassword
 );
 

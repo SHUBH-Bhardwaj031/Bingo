@@ -7,6 +7,7 @@ import Navbar from "../components/layout/Navbar";
 import HeroSlider from "../components/home/HeroSlider";
 import CategorySlider from "../components/home/CategorySlider";
 import RestaurantGrid from "../components/restaurant/RestaurantGrid";
+import Footer from "../components/layout/Footer";
 
 export default function RestaurantListing() {
   const [restaurants, setRestaurants] = useState([]);
@@ -43,7 +44,7 @@ export default function RestaurantListing() {
     getRestaurants();
   }, []);
 
-  // Search (500ms debounce)
+  // Search - 500ms debounce
   useEffect(() => {
     const timer = setTimeout(() => {
       getRestaurants();
@@ -55,14 +56,16 @@ export default function RestaurantListing() {
   return (
     <main className="min-h-screen bg-[#F8F9FB]">
 
+      {/* Navbar */}
       <Navbar />
 
+      {/* Hero */}
       <HeroSlider />
 
+      {/* Categories */}
       <CategorySlider />
 
       {/* Search */}
-
       <section className="max-w-7xl mx-auto px-6 mt-10">
 
         <input
@@ -90,7 +93,6 @@ export default function RestaurantListing() {
       </section>
 
       {/* Restaurants */}
-
       <section className="max-w-7xl mx-auto px-6 py-12">
 
         <div className="flex items-center justify-between mb-8">
@@ -98,15 +100,11 @@ export default function RestaurantListing() {
           <div>
 
             <h2 className="text-3xl font-bold">
-
               Restaurants Near You
-
             </h2>
 
             <p className="text-gray-500 mt-1">
-
               {restaurants.length} restaurants available
-
             </p>
 
           </div>
@@ -119,6 +117,9 @@ export default function RestaurantListing() {
         />
 
       </section>
+
+      {/* Footer */}
+      <Footer />
 
     </main>
   );

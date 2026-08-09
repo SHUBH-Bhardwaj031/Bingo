@@ -106,12 +106,19 @@ export const getFoodsByRestaurant = async (req, res) => {
 
 export const getFoodsByCategory = async (req, res) => {
   try {
-    const foods = await getFoodsByCategoryService(
-      req.params.categoryId
-    );
+    const { category, foods } =
+      await getFoodsByCategoryService(req.params.slug);
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
 
     return res.status(200).json({
       success: true,
+      category,
       total: foods.length,
       foods,
     });
