@@ -66,7 +66,7 @@ export default function Home() {
       {/* ================= CATEGORIES ================= */}
 
       <section className="pt-2">
-        <CategorySlider />
+     <CategorySlider clickable={false} />
       </section>
 
       {/* ================= POPULAR RESTAURANTS ================= */}
@@ -109,11 +109,11 @@ export default function Home() {
 
         </div>
 
-        <RestaurantGrid
-          restaurants={popularRestaurants}
-          loading={loading}
-        />
-
+       <RestaurantGrid
+  restaurants={popularRestaurants}
+  loading={loading}
+  clickable={false}
+/>
         {!loading && restaurants.length > 6 && (
           <div className="flex justify-center mt-10">
 

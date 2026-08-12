@@ -5,10 +5,18 @@ import { ChevronRight } from "lucide-react";
 
 import { serverUrl } from "../../App";
 
-export default function CategorySlider() {
+export default function CategorySlider({
+  clickable = true,
+}) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-const navigate = useNavigate();
+
+  const navigate = useNavigate();
+
+  /* ===========================
+     GET CATEGORIES
+  =========================== */
+
   const getCategories = async () => {
     try {
       const { data } = await axios.get(
@@ -18,6 +26,7 @@ const navigate = useNavigate();
       setCategories(data.categories || []);
     } catch (error) {
       console.error(error);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -27,10 +36,22 @@ const navigate = useNavigate();
     getCategories();
   }, []);
 
+  /* ===========================
+     CATEGORY CLICK
+  =========================== */
+
+  const handleCategoryClick = (category) => {
+    if (!clickable) return;
+
+    navigate(`/category/${category.slug}`);
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-6 mt-10">
 
-      {/* Heading */}
+      {/* ===========================
+          HEADING
+      =========================== */}
 
       <div className="flex items-center justify-between mb-7">
 
@@ -46,17 +67,32 @@ const navigate = useNavigate();
 
         </div>
 
-        <button className="flex items-center gap-2 text-orange-500 font-semibold hover:gap-3 transition-all">
+        {/* View All */}
 
-          View All
+        {clickable && (
+          <button
+            onClick={() => navigate("/restaurants")}
+            className="
+              flex
+              items-center
+              gap-2
+              text-orange-500
+              font-semibold
+              hover:gap-3
+              transition-all
+            "
+          >
+            View All
 
-          <ChevronRight size={18} />
-
-        </button>
+            <ChevronRight size={18} />
+          </button>
+        )}
 
       </div>
 
-      {/* Loading */}
+      {/* ===========================
+          LOADING
+      =========================== */}
 
       {loading ? (
         <div className="flex gap-6 overflow-x-auto">
@@ -64,26 +100,56 @@ const navigate = useNavigate();
           {[...Array(8)].map((_, index) => (
             <div
               key={index}
-              className="w-28 h-28 rounded-full bg-gray-200 animate-pulse flex-shrink-0"
+              className="
+                w-28
+                h-28
+                rounded-full
+                bg-gray-200
+                animate-pulse
+                flex-shrink-0
+              "
             />
           ))}
 
         </div>
       ) : (
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
+
+        /* ===========================
+           CATEGORIES
+        =========================== */
+
+        <div
+          className="
+            flex
+            gap-6
+            overflow-x-auto
+            scrollbar-hide
+            pb-4
+          "
+        >
 
           {categories.map((category) => (
 
             <div
- 
-            key={category._id}
- 
-            onClick={() => navigate(`/category/${category.slug}`)}
- className="group flex-shrink-0 cursor-pointer"
->
+              key={category._id}
+              onClick={() =>
+                handleCategoryClick(category)
+              }
+              className={`
+                group
+                flex-shrink-0
+                ${
+                  clickable
+                    ? "cursor-pointer"
+                    : "cursor-default"
+                }
+              `}
+            >
+
+              {/* IMAGE */}
 
               <div
-                className="
+                className={`
                   w-28
                   h-28
                   rounded-full
@@ -97,24 +163,51 @@ const navigate = useNavigate();
                   justify-center
                   transition-all
                   duration-300
-                  group-hover:scale-110
-                  group-hover:shadow-xl
-                "
+                  ${
+                    clickable
+                      ? "group-hover:scale-110 group-hover:shadow-xl"
+                      : ""
+                  }
+                `}
               >
 
                 <img
                   src={category.icon}
                   alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  className={`
+                    w-full
+                    h-full
+                    object-cover
+                    transition-transform
+                    duration-300
+                    ${
+                      clickable
+                        ? "group-hover:scale-110"
+                        : ""
+                    }
+                  `}
                   loading="lazy"
                 />
 
               </div>
 
-              <h3 className="text-center mt-4 font-semibold text-gray-700 group-hover:text-orange-500 transition">
+              {/* NAME */}
 
+              <h3
+                className={`
+                  text-center
+                  mt-4
+                  font-semibold
+                  text-gray-700
+                  transition
+                  ${
+                    clickable
+                      ? "group-hover:text-orange-500"
+                      : ""
+                  }
+                `}
+              >
                 {category.name}
-
               </h3>
 
             </div>
